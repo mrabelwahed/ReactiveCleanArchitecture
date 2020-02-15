@@ -45,8 +45,7 @@ class GifListFragment : BaseFragment(), OnClickListener {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-    var lastQuery: String = "init"
-    var resetData: Boolean = false
+     var newQuery :String? = null
 
     private lateinit var searchView: SearchView
     private var stopLoadingMore: Boolean = false
@@ -94,29 +93,17 @@ class GifListFragment : BaseFragment(), OnClickListener {
     private fun addQueryListener() {
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                // check if the user search using another query
-                // so we need to reset the recycler view and adapter
-                resetData = lastQuery != query
-                if (resetData) {
-                    //reset view
-                    resetView()
-                    //reset offset
-                    offset =0
-                    //make new search
-                    query?.let {
-                       searchGIF(it, offset )
-                        lastQuery = it
-                    }
-
-                }
+                resetView()
+                newQuery =query
+                gifListViewModel.onQueryTextChange(query,0L)
                 searchView.hideKeyboard()
-
                 return true
 
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                return true
+
+                return false
             }
 
 
@@ -124,10 +111,7 @@ class GifListFragment : BaseFragment(), OnClickListener {
     }
 
     fun resetView() {
-
-         gifyListAdapter.gifList.clear()
-         gifyListAdapter.notifyDataSetChanged()
-        // gifyListAdapter.addGifs(list)
+        gifyListAdapter.clearAllGIF()
     }
 
     private fun setupView() {
@@ -220,7 +204,7 @@ class GifListFragment : BaseFragment(), OnClickListener {
                 if (!loading && totalItemCount <= lastVisibleItem + VISIBLE_THRESHOLD) {
                     offset += 20
                     if (!stopLoadingMore)
-                       gifListViewModel.nextPage(offset)
+                       newQuery?.let{gifListViewModel.nextPage(it,offset)}
                     loading = true
                 }
             }
@@ -241,9 +225,7 @@ class GifListFragment : BaseFragment(), OnClickListener {
     }
 
 
-    fun searchGIF(query: String, offset: Long ) {
-        gifListViewModel.search(query, offset)
-    }
+
 
     fun View.hideKeyboard() {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

@@ -8,23 +8,27 @@ import com.gify.ui.mapper.GifModelMapper
 import com.gify.ui.viewstate.ServerDataState
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.processors.PublishProcessor
-import io.reactivex.subjects.PublishSubject
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
 
 class GifListViewModel @Inject constructor(private val getGifListUseCase: GetGifListUseCase) :
     BaseViewModel() {
-    val paginator = PublishProcessor.create<Long>()
-    private var offset = 0L
+    val paginator = PublishProcessor.create<String>()
+    private var newOffset = 0L
+    private var queryStr = ""
     private val viewState = MutableLiveData<ServerDataState>()
     val liveGifData: LiveData<ServerDataState>
         get() = viewState
 
+    init {
+        initDisposable()
+    }
 
-    fun search(query:String , offset: Long ) {
-        this.offset = offset
+    fun initDisposable() {
         val disposable = paginator
             .doOnNext { viewState.value = ServerDataState.Loading }
-            .concatMap { getGifListUseCase.execute(QueryDTO(query , offset)) }
+            .concatMap { getGifListUseCase.execute(QueryDTO(queryStr, newOffset)) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { res -> viewState.value = ServerDataState.Success(GifModelMapper.transform(res)) },
@@ -32,16 +36,23 @@ class GifListViewModel @Inject constructor(private val getGifListUseCase: GetGif
             )
 
         compositeDisposable.add(disposable)
-           paginator.onNext(offset)
     }
 
 
-    fun nextPage(offset: Long) {
-        this.offset = offset
-        paginator.onNext(offset)
+    fun nextPage(query: String, offset: Long) {
+        this.newOffset = offset
+        this.queryStr = query
+        paginator.onNext(queryStr)
     }
 
 
+    fun onQueryTextChange(newText: String?,offset: Long) {
+        if (newText == null || newText.isEmpty()) {
+            //onBooksFetched(ArrayList<Book>())
+        } else {
+            nextPage(newText,offset)
+        }
+    }
 
 
 }

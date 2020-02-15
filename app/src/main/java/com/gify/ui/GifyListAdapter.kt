@@ -80,6 +80,11 @@ class GifyListAdapter @Inject constructor() :
         notifyDataSetChanged()
     }
 
+    fun clearAllGIF(){
+        gifList.clear()
+        notifyDataSetChanged()
+    }
+
     fun addLoadingData() {
         gifList.add(
             GifModel(
