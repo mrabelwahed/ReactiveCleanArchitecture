@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Dagger2Course</string>
+    <string name="app_name">GIF Search</string>
+    <string name="search">Search</string>
+    <string name="empty_text">It seems no data available now, try to  make a new search </string>
+    <string name="search_hint">your keyword is like previous search</string>
+
 </resources>

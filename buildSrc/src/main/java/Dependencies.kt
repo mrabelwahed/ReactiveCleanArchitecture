@@ -1,3 +1,5 @@
+import Versions.GLIDE_VERSION
+
 object Versions {
     val KOTLIN = "1.3.20"
     val COMPILE_SDK = 28
@@ -16,8 +18,8 @@ object Versions {
     val OKHTTP_LOGGING_INTERCEPTOR_VERSION = "3.12.1"
     val LIFE_CYCLE_VERSION = "2.2.0"
     val CARD_VIEW_VERSION = "1.0.0"
+    val GLIDE_VERSION = "4.11.0"
     val RECYCLERVIEW_VERSION = "1.1.0"
-    val PICASSO_VERSION = "2.71828"
     val CONSTRAINT_LAYOUT = "1.1.3"
     val ANDROID_GRADLE_VERSION = "3.3.1"
     val ESPRESSO_VERSION = "3.1.1"
@@ -28,6 +30,7 @@ object Versions {
     val RULES_VER = "1.1.1"
     val TRUTH_VER = "1.1.0"
     val JUNIT_EXT_VER = "1.1.0"
+    val MATERIAL_VERSION ="1.0.0"
 }
 
 object BuildPlugins {
@@ -41,7 +44,7 @@ object Android {
     val versionCode = Versions.VERSION_CODE
     val versionName = Versions.VERSION_NAME
     val compileSDK = Versions.COMPILE_SDK
-    val applicationId = "com.pepefutetask"
+    val applicationId = "com.gify"
 }
 
 object Libs {
@@ -50,17 +53,19 @@ object Libs {
     val rxAndroid = "io.reactivex.rxjava2:rxandroid:${Versions.RX_ANDROID}"
     val rxAdapter = "com.squareup.retrofit2:adapter-rxjava2:${Versions.RX_RETROFIT_ADAPTER}"
     val retrofit = "com.squareup.retrofit2:retrofit:${Versions.RETROFIT_VERSION}"
+    val material = "com.google.android.material:material:${Versions.MATERIAL_VERSION}"
     val gson = "com.google.code.gson:gson:${Versions.GSON_VERSION}"
     val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.GSON_CONVERTER}"
     val dagger = "com.google.dagger:dagger:${Versions.DAGGER_VERSION}"
     val daggerCompiler = "com.google.dagger:dagger-compiler:${Versions.DAGGER_COMPILER}"
     val loggingInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.OKHTTP_LOGGING_INTERCEPTOR_VERSION}"
     val recyclerview = "androidx.recyclerview:recyclerview:${Versions.RECYCLERVIEW_VERSION}"
-    val cardview = "androidx.recyclerview:recyclerview:${Versions.CARD_VIEW_VERSION}"
+    val cardview = "androidx.cardview:cardview:${Versions.CARD_VIEW_VERSION}"
     val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.CONSTRAINT_LAYOUT}"
     val liveData = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.LIFE_CYCLE_VERSION}"
     val viewModel = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.LIFE_CYCLE_VERSION}"
-    val picasso = "com.squareup.picasso:picasso:${Versions.PICASSO_VERSION}"
+    val glide =  "com.github.bumptech.glide:glide:${Versions.GLIDE_VERSION}"
+    val glideCompiler =  "com.github.bumptech.glide:compiler:${Versions.GLIDE_VERSION}"
     val appCompat = "androidx.appcompat:appcompat:${Versions.APP_COMPAT_VERSION}"
     val coreExt = "androidx.core:core-ktx:${Versions.CORE_KTX}"
 }
