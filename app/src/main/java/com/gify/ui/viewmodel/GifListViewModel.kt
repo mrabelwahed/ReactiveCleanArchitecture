@@ -46,10 +46,10 @@ class GifListViewModel @Inject constructor(private val getGifListUseCase: GetGif
     }
 
 
-    fun onQueryTextChange(query: String) {
-            this.lastQuery = query
-            this.lastOffset =0L
-            loadNextPage()
+
+    fun setNewQuery(query: String){
+        this.lastQuery = query
+        this.lastOffset =0L
     }
 
 

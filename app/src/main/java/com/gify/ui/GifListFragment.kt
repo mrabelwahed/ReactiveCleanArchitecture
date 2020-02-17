@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -47,7 +46,7 @@ class GifListFragment : BaseFragment(), OnClickListener {
 
     private lateinit var searchView: SearchView
 
-    private var newQueryIsFired =false
+    private var newQueryIsFired = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -76,11 +75,16 @@ class GifListFragment : BaseFragment(), OnClickListener {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 if (query == null || query.isEmpty()) {
-                    Snackbar.make(mainContent,getString(R.string.search_hint),Snackbar.LENGTH_SHORT).show()
-                }else{
-                    newQueryIsFired =true
+                    Snackbar.make(
+                        mainContent,
+                        getString(R.string.search_hint),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    newQueryIsFired = true
                     resetView()
-                    gifListViewModel.onQueryTextChange(query)
+                    gifListViewModel.setNewQuery(query)
+                    gifListViewModel.loadNextPage()
                 }
 
                 myActionMenuItem.collapseActionView()
@@ -88,11 +92,10 @@ class GifListFragment : BaseFragment(), OnClickListener {
             }
 
             override fun onQueryTextChange(s: String): Boolean {
-                return  false
+                return false
             }
         })
     }
-
 
 
     fun resetView() {
@@ -155,51 +158,48 @@ class GifListFragment : BaseFragment(), OnClickListener {
     }
 
 
-    private fun handleUILoading(){
+    private fun handleUILoading() {
         loading = true
         emptyView.visibility = View.GONE
         errorView.visibility = View.GONE
-        //gifyListAdapter.addLoadingData()
     }
 
 
-    private fun handleUIError(){
+    private fun handleUIError() {
         loading = false
         newQueryIsFired = false
         errorView.visibility = View.VISIBLE
         gifList.visibility = View.GONE
         emptyView.visibility = View.GONE
-        //gifyListAdapter.removeLoadingData()
     }
 
 
-    private fun handleUISuccess(){
+    private fun handleUISuccess() {
         loading = false
         newQueryIsFired = false
         emptyView.visibility = View.GONE
         errorView.visibility = View.GONE
         gifList.visibility = View.VISIBLE
-        //gifyListAdapter.removeLoadingData()
     }
 
 
     private fun setError(failure: Failure?) {
         failure?.let {
-           when (it) {
-               is Failure.NetworkConnection -> {
-                   errorText.text = getString(R.string.failure_network_connection)
-               }
-               is Failure.ServerError -> {
-                   errorText.text = getString(R.string.failure_server_error)
-                   errorImage.setImageResource(R.drawable.undraw_page_not_found_su7k)
+            when (it) {
+                is Failure.NetworkConnection -> {
+                    errorText.text = getString(R.string.failure_network_connection)
+                }
+                is Failure.ServerError -> {
+                    errorText.text = getString(R.string.failure_server_error)
+                    errorImage.setImageResource(R.drawable.undraw_page_not_found_su7k)
 
-               }
-               is Failure.UnExpectedError -> {
-                   errorText.text = getString(R.string.failure_unexpected_error)
-                   errorImage.setImageResource(R.drawable.undraw_page_not_found_su7k)
-               }
-           }
-       }
+                }
+                is Failure.UnExpectedError -> {
+                    errorText.text = getString(R.string.failure_unexpected_error)
+                    errorImage.setImageResource(R.drawable.undraw_page_not_found_su7k)
+                }
+            }
+        }
     }
 
 
@@ -220,7 +220,7 @@ class GifListFragment : BaseFragment(), OnClickListener {
                 totalItemCount = gridLayoutManager.itemCount
                 lastVisibleItem = gridLayoutManager.findLastVisibleItemPosition()
                 if (!loading && totalItemCount <= lastVisibleItem + VISIBLE_THRESHOLD) {
-                    if(!newQueryIsFired){
+                    if (!newQueryIsFired) {
                         gifListViewModel.incrementOffset()
                         gifListViewModel.loadNextPage()
                     }

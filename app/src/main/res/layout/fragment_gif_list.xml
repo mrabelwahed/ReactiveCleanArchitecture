@@ -11,7 +11,7 @@
             android:id="@+id/gifList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:listitem="@layout/item_loading"
+            tools:listitem="@layout/item_grid"
             android:visibility="gone"
             >
 

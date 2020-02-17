@@ -85,9 +85,4 @@ object TestLibs {
     val junitExt = "androidx.test.ext:junit:${Versions.JUNIT_EXT_VER}"
     val mockito =  "org.mockito:mockito-inline:${Versions.MOCKITO}"
     val mockHttpServer = "com.squareup.okhttp:mockwebserver:$MOCK_HTTP_SERVER"
-    // val mockito = "org.mockito:mockito-core:$mockitoVersion"
-    //val dexmaker = "com.google.dexmaker:dexmaker:1.2"
-    // val dexmaker_mockito = "com.google.dexmaker:dexmaker-mockito:1.2"
-    // val annotations = "com.android.support:support-annotations:$supportVersion"
-    //val espresso = "com.android.support.test.espresso:espresso-core:2.2.2"
 }
