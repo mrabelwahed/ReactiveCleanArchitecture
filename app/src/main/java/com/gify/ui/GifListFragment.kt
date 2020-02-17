@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.SearchView
@@ -25,6 +24,7 @@ import com.gify.ui.viewmodel.GifListViewModel
 import com.gify.ui.viewmodel.ViewModelFactory
 import com.gify.ui.viewstate.ServerDataState
 import com.gify.util.EspressoIdlingResource
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.content_empty.*
 import kotlinx.android.synthetic.main.content_error.*
 import kotlinx.android.synthetic.main.fragment_gif_list.*
@@ -39,16 +39,15 @@ class GifListFragment : BaseFragment(), OnClickListener {
     private var loading = false
     private lateinit var gridLayoutManager: GridLayoutManager
     private val VISIBLE_THRESHOLD = 1
-    private var offset = 0L
     @Inject
     lateinit var gifyListAdapter: GifyListAdapter
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-     var newQuery :String? = null
 
     private lateinit var searchView: SearchView
-    private var stopLoadingMore: Boolean = false
+
+    private var newQueryIsFired =false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -70,45 +69,31 @@ class GifListFragment : BaseFragment(), OnClickListener {
 
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        configureToolbar(inflater, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
+        inflater.inflate(R.menu.meanu_search, menu)
 
+        val myActionMenuItem = menu.findItem(R.id.action_search)
+        searchView = myActionMenuItem.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                if (query == null || query.isEmpty()) {
+                    Snackbar.make(mainContent,getString(R.string.search_hint),Snackbar.LENGTH_SHORT).show()
+                }else{
+                    newQueryIsFired =true
+                    resetView()
+                    gifListViewModel.onQueryTextChange(query)
+                }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == R.id.action_search) {
-            addQueryListener()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun configureToolbar(menuInflater: MenuInflater, menu: Menu?) {
-        menuInflater.inflate(R.menu.meanu_search, menu)
-        val searchItem = menu?.findItem(R.id.action_search)
-        searchView = (searchItem?.actionView as SearchView)
-        searchView?.queryHint = getString(R.string.search)
-    }
-
-    private fun addQueryListener() {
-        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                resetView()
-                newQuery =query
-                gifListViewModel.onQueryTextChange(query,0L)
-                searchView.hideKeyboard()
-                return true
-
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-
+                myActionMenuItem.collapseActionView()
                 return false
             }
 
-
+            override fun onQueryTextChange(s: String): Boolean {
+                return  false
+            }
         })
     }
+
+
 
     fun resetView() {
         gifyListAdapter.clearAllGIF()
@@ -150,7 +135,6 @@ class GifListFragment : BaseFragment(), OnClickListener {
             when (it) {
                 is ServerDataState.Success<*> -> {
                     val gifItems = (it.item as ArrayList<GifModel>)
-                    stopLoadingMore =gifItems.size <20
                     handleUISuccess()
                     setData(gifItems)
                     EspressoIdlingResource.decrement()
@@ -181,6 +165,7 @@ class GifListFragment : BaseFragment(), OnClickListener {
 
     private fun handleUIError(){
         loading = false
+        newQueryIsFired = false
         errorView.visibility = View.VISIBLE
         gifList.visibility = View.GONE
         emptyView.visibility = View.GONE
@@ -190,6 +175,7 @@ class GifListFragment : BaseFragment(), OnClickListener {
 
     private fun handleUISuccess(){
         loading = false
+        newQueryIsFired = false
         emptyView.visibility = View.GONE
         errorView.visibility = View.GONE
         gifList.visibility = View.VISIBLE
@@ -234,9 +220,11 @@ class GifListFragment : BaseFragment(), OnClickListener {
                 totalItemCount = gridLayoutManager.itemCount
                 lastVisibleItem = gridLayoutManager.findLastVisibleItemPosition()
                 if (!loading && totalItemCount <= lastVisibleItem + VISIBLE_THRESHOLD) {
-                    offset += 20
-                    if (!stopLoadingMore)
-                       newQuery?.let{gifListViewModel.loadNextPage(it,offset)}
+                    if(!newQueryIsFired){
+                        gifListViewModel.incrementOffset()
+                        gifListViewModel.loadNextPage()
+                    }
+
                     loading = true
                 }
             }
@@ -254,14 +242,6 @@ class GifListFragment : BaseFragment(), OnClickListener {
             .addToBackStack(null)
             .commit()
 
-    }
-
-
-
-
-    fun View.hideKeyboard() {
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(windowToken, 0)
     }
 
 }
