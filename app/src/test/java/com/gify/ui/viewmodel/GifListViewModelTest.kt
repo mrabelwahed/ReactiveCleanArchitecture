@@ -62,8 +62,8 @@ class GifListViewModelTest {
     fun `search gif should return lis of gifs`() {
         //given
         val list = ArrayList<Gif>()
-        list.add(Gif("1", "t1", "", ""))
-        list.add(Gif("2", "t2", "", ""))
+        list.add(Gif("1", "t1", "prev_url1", "orig_url1"))
+        list.add(Gif("2", "t2", "prev_url2", "orig_url2"))
         val expected= ServerDataState.Success(GifModelMapper.transform(list))
         //when
         gifListViewModel.viewState.value = ServerDataState.Success(GifModelMapper.transform(list))
