@@ -81,8 +81,8 @@ class GifListViewModelTest {
     fun `no internet connection`() {
         //given
         val list = ArrayList<Gif>()
-        list.add(Gif("1", "t1", "", ""))
-        list.add(Gif("2", "t2", "", ""))
+        list.add(Gif("1", "t1", "prev_url1", "orig_url1"))
+        list.add(Gif("2", "t2", "prev_url2", "orig_url2"))
         val networkconnection = com.gify.data.exceptions.Failure.NetworkConnection
         val expected= ServerDataState.Error(networkconnection)
         //when
