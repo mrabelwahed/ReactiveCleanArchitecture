@@ -11,5 +11,8 @@
     <dimen name="elevation_high">12dp</dimen>
     <dimen name="status_bar_height">25dp</dimen>
     <dimen name="gif_width">180dp</dimen>
+    <dimen name="text_large">20dp</dimen>
+
+
 
 </resources>

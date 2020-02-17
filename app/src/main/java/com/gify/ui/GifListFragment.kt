@@ -2,7 +2,6 @@ package com.gify.ui
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -17,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.gify.AppConst.keys.GIF_IMAGE
 import com.gify.BaseApp
 import com.gify.R
+import com.gify.data.exceptions.Failure
 import com.gify.ui.GifAdapterViewTypes.GIF_MAIN_ITEM
 import com.gify.ui.GifAdapterViewTypes.LOADING_ITEM
 import com.gify.ui.decoration.SpacesItemDecoration
@@ -149,30 +149,20 @@ class GifListFragment : BaseFragment(), OnClickListener {
         gifListViewModel.liveGifData.observe(this, Observer {
             when (it) {
                 is ServerDataState.Success<*> -> {
-                    loading = false
-                    stopLoadingMore = (it.item as ArrayList<GifModel>).size <20
-                    emptyView.visibility = View.GONE
-                    errorView.visibility = View.GONE
-                    gifList.visibility = View.VISIBLE
-                   // gifyListAdapter.removeLoadingData()
-                    setData(it.item as ArrayList<GifModel>)
+                    val gifItems = (it.item as ArrayList<GifModel>)
+                    stopLoadingMore =gifItems.size <20
+                    handleUISuccess()
+                    setData(gifItems)
                     EspressoIdlingResource.decrement()
                 }
                 is ServerDataState.Error -> {
-                    loading = false
-                    errorView.visibility = View.VISIBLE
-                    gifList.visibility = View.GONE
-                    emptyView.visibility = View.GONE
-                    //gifyListAdapter.removeLoadingData()
-                    setError(it.message)
+                    handleUIError()
+                    setError(it.failure)
                     EspressoIdlingResource.decrement()
                 }
 
                 is ServerDataState.Loading -> {
-                    loading = true
-                    emptyView.visibility = View.GONE
-                    errorView.visibility = View.GONE
-                    //gifyListAdapter.addLoadingData()
+                    handleUILoading()
                     EspressoIdlingResource.increment()
                 }
             }
@@ -180,8 +170,50 @@ class GifListFragment : BaseFragment(), OnClickListener {
         })
     }
 
-    private fun setError(message: String?) {
-        Log.e("ERROR", message)
+
+    private fun handleUILoading(){
+        loading = true
+        emptyView.visibility = View.GONE
+        errorView.visibility = View.GONE
+        //gifyListAdapter.addLoadingData()
+    }
+
+
+    private fun handleUIError(){
+        loading = false
+        errorView.visibility = View.VISIBLE
+        gifList.visibility = View.GONE
+        emptyView.visibility = View.GONE
+        //gifyListAdapter.removeLoadingData()
+    }
+
+
+    private fun handleUISuccess(){
+        loading = false
+        emptyView.visibility = View.GONE
+        errorView.visibility = View.GONE
+        gifList.visibility = View.VISIBLE
+        //gifyListAdapter.removeLoadingData()
+    }
+
+
+    private fun setError(failure: Failure?) {
+        failure?.let {
+           when (it) {
+               is Failure.NetworkConnection -> {
+                   errorText.text = getString(R.string.failure_network_connection)
+               }
+               is Failure.ServerError -> {
+                   errorText.text = getString(R.string.failure_server_error)
+                   errorImage.setImageResource(R.drawable.undraw_page_not_found_su7k)
+
+               }
+               is Failure.UnExpectedError -> {
+                   errorText.text = getString(R.string.failure_unexpected_error)
+                   errorImage.setImageResource(R.drawable.undraw_page_not_found_su7k)
+               }
+           }
+       }
     }
 
 
@@ -204,7 +236,7 @@ class GifListFragment : BaseFragment(), OnClickListener {
                 if (!loading && totalItemCount <= lastVisibleItem + VISIBLE_THRESHOLD) {
                     offset += 20
                     if (!stopLoadingMore)
-                       newQuery?.let{gifListViewModel.nextPage(it,offset)}
+                       newQuery?.let{gifListViewModel.loadNextPage(it,offset)}
                     loading = true
                 }
             }

@@ -1,4 +1,5 @@
 import Versions.GLIDE_VERSION
+import Versions.MOCK_HTTP_SERVER
 
 object Versions {
     val KOTLIN = "1.3.20"
@@ -31,6 +32,8 @@ object Versions {
     val TRUTH_VER = "1.1.0"
     val JUNIT_EXT_VER = "1.1.0"
     val MATERIAL_VERSION ="1.0.0"
+    val MOCKITO ="2.13.0"
+    val MOCK_HTTP_SERVER ="2.7.5"
 }
 
 object BuildPlugins {
@@ -80,6 +83,8 @@ object TestLibs {
     val rules = "androidx.test:rules:${Versions.RULES_VER}"
     val truth = "androidx.test.ext:truth:${Versions.TRUTH_VER}"
     val junitExt = "androidx.test.ext:junit:${Versions.JUNIT_EXT_VER}"
+    val mockito =  "org.mockito:mockito-inline:${Versions.MOCKITO}"
+    val mockHttpServer = "com.squareup.okhttp:mockwebserver:$MOCK_HTTP_SERVER"
     // val mockito = "org.mockito:mockito-core:$mockitoVersion"
     //val dexmaker = "com.google.dexmaker:dexmaker:1.2"
     // val dexmaker_mockito = "com.google.dexmaker:dexmaker-mockito:1.2"

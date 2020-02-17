@@ -42,6 +42,10 @@ dependencies {
     androidTestImplementation TestLibs.rules
     androidTestImplementation TestLibs.truth
     androidTestImplementation TestLibs.junitExt
+    testImplementation TestLibs.mockito
+    testImplementation TestLibs.mockHttpServer
+
+
     //material lib
     implementation Libs.material
     // android libs
@@ -68,4 +72,5 @@ dependencies {
     //glide
     implementation Libs.glide
     kapt Libs.glideCompiler
+
 }
